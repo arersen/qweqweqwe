@@ -59,9 +59,9 @@ void MPU6050_Read_Gyro(Vector3* pGyro){
 
 	MPU6050_Read(GYRO_XOUT_H_REG, Rec_Data, 6); // sizeof(Rec_Data)
 
-	pAccel->x = (uint16_t)(Rec_Data[0] << 8 | RecData[1]);
-	pAccel->y = (uint16_t)(Rec_Data[2] << 8 | RecData[3]);
-	pAccel->z = (uint16_t)(Rec_Data[4] << 8 | RecData[5]);
+	pGyro->x = (uint16_t)(Rec_Data[0] << 8 | RecData[1]);
+	pGyro->y = (uint16_t)(Rec_Data[2] << 8 | RecData[3]);
+	pGyro->z = (uint16_t)(Rec_Data[4] << 8 | RecData[5]);
 	
 
 }

@@ -26,7 +26,12 @@
 
 typedef struct{
 	uint16_t x, y, z;
+} U16_vec3;
+
+typedef struct{
+	double x, y, z;
 } Vector3;
+	
 void MPU6050_Init(I2C_HandleTypeDef* hi2c);
 
 

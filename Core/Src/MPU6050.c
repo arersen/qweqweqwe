@@ -42,11 +42,14 @@ void MPU6050_Init(I2C_HandleTypeDef* hi2c_target){
 
 }
 
-void MPU6050_Read_Accel(void){
+void MPU6050_Read_Accel(Vector3* pAccel){
 	uint8_t Rec_Data[6];
 
 	MPU6050_Read(ACCEL_XOUT_H_REG, Rec_Data, 6); // sizeof(Rec_Data)
 
-	A
+	pAccel->x = (uint16_t)(Rec_Data[0] << 8 | RecData[1]);
+	pAccel->y = (uint16_t)(Rec_Data[2] << 8 | RecData[3]);
+	pAccel->z = (uint16_t)(Rec_Data[4] << 8 | RecData[5]);
+	
 
 }

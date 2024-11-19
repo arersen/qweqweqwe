@@ -20,6 +20,13 @@
 #define PWR_MGMT_1_REG 0x6B
 #define WHO_AM_I_REG 0x75
 
+#define MPU_SET_TIMEOUT 1000
+#define MPU_REG_SIZE 1
+#define MPU_MEMADD_SIZE 1
+
+typedef struct{
+	uint16_t x, y, z;
+} Vector3;
 void MPU6050_Init(I2C_HandleTypeDef* hi2c);
 
 

@@ -10,12 +10,12 @@
 
 I2C_HandleTypeDef* hi2c;
 
-void MPU6050_Write(uint16_t MemAddress, uint8_t *pData){
-	HAL_I2C_Mem_Write(hi2c, MPU6050_ADDR, MemAddress, MPU_MEMADD_SIZE, pData, MPU_SIZE, MPU_SET_TIMEOUT);
+void MPU6050_Write(uint16_t MemAddress, uint8_t *pData, uint16_t Size){
+	HAL_I2C_Mem_Write(hi2c, MPU6050_ADDR, MemAddress, MPU_MEMADD_SIZE, pData, Size, MPU_SET_TIMEOUT);
 }
 
-void MPU6050_Read(uint16_t MemAddress, uint8_t *pData){
-	HAL_I2C_Mem_Read(hi2c, MPU6050_ADDR, MemAddress, MPU_MEMADD_SIZE, pData, MPU_SIZE, MPU_SET_TIMEOUT);
+void MPU6050_Read(uint16_t MemAddress, uint8_t *pData,  uint16_t Size){
+	HAL_I2C_Mem_Read(hi2c, MPU6050_ADDR, MemAddress, MPU_MEMADD_SIZE, pData, Size, MPU_SET_TIMEOUT);
 }
 
 void MPU6050_Init(I2C_HandleTypeDef* hi2c_target){
@@ -25,13 +25,28 @@ void MPU6050_Init(I2C_HandleTypeDef* hi2c_target){
 	MPU6050_Read(WHO_AM_I_REG, &check);
 	if(check == 104){
 		data = 0;
-		MPU6050_Write(PWR_MGMT_1_REG, &data);
+		MPU6050_Write(PWR_MGMT_1_REG, &data, 1);
 
 		data = 0x07; // Data rate 1 KHz
-		MPU6050_Write(SMPLRT_DIV_REG, &data);
+		MPU6050_Write(SMPLRT_DIV_REG, &data, 1);
+
+		data = 0x00;
+		MPU6050_Write(ACCEL_CONFIG_REG, &data, 1);
+
+		data = 0x00;
+		MPU6050_Write(GYRO_CONFIG_REG, &data, 1);
 
 
 
 	}
+
+}
+
+void MPU6050_Read_Accel(void){
+	uint8_t Rec_Data[6];
+
+	MPU6050_Read(ACCEL_XOUT_H_REG, Rec_Data, 6); // sizeof(Rec_Data)
+
+	A
 
 }

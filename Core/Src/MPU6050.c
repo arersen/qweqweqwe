@@ -8,13 +8,7 @@
 
 #include "MPU6050.h"
 
-typedef struct{
-	double x, y, z;
-} Vector3;
 
-typedef struct{
-	uint16_t x, y, z;
-} u16vec3;
 
 I2C_HandleTypeDef* hi2c;
 

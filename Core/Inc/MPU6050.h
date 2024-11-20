@@ -24,15 +24,10 @@
 #define MPU_REG_SIZE 1
 #define MPU_MEMADD_SIZE 1
 
-typedef struct{
-	uint16_t x, y, z;
-} U16_vec3;
 
-typedef struct{
-	double x, y, z;
-} Vector3;
-	
 void MPU6050_Init(I2C_HandleTypeDef* hi2c);
+void MPU6050_Read_Accel(Vector3* pAccel);
+void MPU6050_Read_Gyro(Vector3* pGyro);
 
 
 #endif /* INC_MPU6050_H_ */

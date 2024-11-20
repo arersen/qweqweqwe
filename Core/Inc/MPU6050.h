@@ -6,7 +6,10 @@
  */
 
 #ifndef INC_MPU6050_H_
+
+#pragma once
 #include "main.h"
+
 #define INC_MPU6050_H_
 
 #define MPU6050_ADDR 0xD0
@@ -23,6 +26,14 @@
 #define MPU_SET_TIMEOUT 1000
 #define MPU_REG_SIZE 1
 #define MPU_MEMADD_SIZE 1
+
+typedef struct{
+	double x, y, z;
+} Vector3;
+
+typedef struct{
+	uint16_t x, y, z;
+} u16vec3;
 
 
 void MPU6050_Init(I2C_HandleTypeDef* hi2c);

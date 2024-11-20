@@ -29,11 +29,11 @@
 
 typedef struct{
 	double x, y, z;
-} Vector3;
+} __attribute__((packed)) Vector3;
 
 typedef struct{
 	uint16_t x, y, z;
-} u16vec3;
+} __attribute__((packed)) u16vec3;
 
 
 void MPU6050_Init(I2C_HandleTypeDef* hi2c);

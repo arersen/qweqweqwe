@@ -19,9 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "MPU6050.h"
-#include <stdio.h>
-#include <string.h>
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -43,7 +40,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef hi2c2;
 
 UART_HandleTypeDef huart2;
 
@@ -54,7 +51,7 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void);
+static void MX_I2C2_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -94,7 +91,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C1_Init();
+  MX_I2C2_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
@@ -103,54 +100,24 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  MPU6050_Init(&hi2c1);
-  Vector3 accel;
-  Vector3 gyro;
+  MPU6050_Init_StatusTypeDef __attribute__((unused)) MPU6050_Init_Status = MPU6050_Init(&hi2c2);
 
-  // GOVNOCODE START
+  Vector3 accel, gyro;
+  HAL_StatusTypeDef __attribute__((unused)) Accel_HAL_Status, Gyro_HAL_Status __attribute__((unused));
 
-  typedef struct{
- 	  char x[16], y[16], z[16];
-   } Vec3string;
-
-   Vec3string float_string_pos;
-  void float_string(float x, char* buffer, size_t size){
-	  memset(buffer, 0, sizeof(size));
-	  sprintf(buffer, "%d.%d", (int)x, (int)(1000 * (x - (int)x)));
-  }
-  char message[256];
-  char float_buffer[32];
-
-
-  void convert_vec3(Vector3 vec3, Vec3string* vec3string){
-	  float_string(vec3.x, vec3string->x, sizeof(vec3string->x));
-	  float_string(vec3.y, vec3string->y, sizeof(vec3string->y));
-	  float_string(vec3.z, vec3string->z, sizeof(vec3string->z));
-  }
-
-  // GOVNOCODE END
   while (1)
   {
+
+
+	  Accel_HAL_Status = MPU6050_Read_Accel(&accel);
+	  Gyro_HAL_Status  = MPU6050_Read_Gyro(&gyro);
+
+	  uint8_t __attribute__((unused)) size_vector3 = sizeof(Vector3);
+	  uint8_t __attribute__((unused)) size_u16vec3 = sizeof(u16vec3);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  memset(message, 0, sizeof(message));
-
-	  MPU6050_Read_Accel(&accel);
-	  MPU6050_Read_Gyro(&gyro);
-
-	  convert_vec3(accel, &float_string_pos);
-	  sprintf(message, "Accel: %s\t%s\t%s\n\r", float_string_pos.x, float_string_pos.y, float_string_pos.z);
-	  HAL_UART_Transmit(&huart2, message, sizeof(message), 10);
-
-	  convert_vec3(gyro, &float_string_pos);
-	  sprintf(message, "Gyro: %s\t%s\t%s\n\n\r", float_string_pos.x, float_string_pos.y, float_string_pos.z);
-	  HAL_UART_Transmit(&huart2, message, sizeof(message), 10);
-
-
-	  HAL_Delay(100);
-
-
   }
   /* USER CODE END 3 */
 }
@@ -201,50 +168,50 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief I2C1 Initialization Function
+  * @brief I2C2 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_I2C1_Init(void)
+static void MX_I2C2_Init(void)
 {
 
-  /* USER CODE BEGIN I2C1_Init 0 */
+  /* USER CODE BEGIN I2C2_Init 0 */
 
-  /* USER CODE END I2C1_Init 0 */
+  /* USER CODE END I2C2_Init 0 */
 
-  /* USER CODE BEGIN I2C1_Init 1 */
+  /* USER CODE BEGIN I2C2_Init 1 */
 
-  /* USER CODE END I2C1_Init 1 */
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00C12166;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  /* USER CODE END I2C2_Init 1 */
+  hi2c2.Instance = I2C2;
+  hi2c2.Init.Timing = 0x00C12166;
+  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c2.Init.OwnAddress2 = 0;
+  hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Configure Analogue filter
   */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Configure Digital filter
   */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN I2C1_Init 2 */
+  /* USER CODE BEGIN I2C2_Init 2 */
 
-  /* USER CODE END I2C1_Init 2 */
+  /* USER CODE END I2C2_Init 2 */
 
 }
 
@@ -295,7 +262,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 

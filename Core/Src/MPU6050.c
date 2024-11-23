@@ -1,77 +1,48 @@
 /*
- * MPU6050.c
+ * MPU6050.h
  *
  *  Created on: Nov 19, 2024
  *      Author: arsen
  */
 
+#ifndef INC_MPU6050_H_
 
-#include "MPU6050.h"
+#pragma once
+#include "main.h"
 
+#define INC_MPU6050_H_
 
+#define MPU6050_ADDR 0xD0
 
-I2C_HandleTypeDef* hi2c;
+#define SMPLRT_DIV_REG 0x19
+#define GYRO_CONFIG_REG 0x1B
+#define ACCEL_CONFIG_REG 0x1C
+#define ACCEL_XOUT_H_REG 0x3B
+#define TEMP_OUT_H_REG 0x41
+#define GYRO_XOUT_H_REG 0x43
+#define PWR_MGMT_1_REG 0x6B
+#define WHO_AM_I_REG 0x75
 
-HAL_StatusTypeDef MPU6050_Write(uint16_t MemAddress, uint8_t *pData, uint16_t Size){
-	return HAL_I2C_Mem_Write(hi2c, MPU6050_ADDR, MemAddress, MPU_MEMADD_SIZE, pData, Size, MPU_SET_TIMEOUT);
-}
+#define MPU_SET_TIMEOUT 1000
+#define MPU_REG_SIZE 1
+#define MPU_MEMADD_SIZE 1
 
-HAL_StatusTypeDef MPU6050_Read(uint16_t MemAddress, uint8_t *pData,  uint16_t Size){
-	return HAL_I2C_Mem_Read(hi2c, MPU6050_ADDR, MemAddress, MPU_MEMADD_SIZE, pData, Size, MPU_SET_TIMEOUT);
-}
+typedef struct{
+	float x, y, z;
+} Vector3;
 
-MPU6050_Init_StatusTypeDef MPU6050_Init(I2C_HandleTypeDef* hi2c_target){
-	MPU6050_Init_StatusTypeDef status;
-	uint8_t data;
+typedef struct{
+	uint16_t x, y, z;
+} u16vec3;
 
-	hi2c = hi2c_target;
+typedef struct{
+	HAL_StatusTypeDef WHO_AM_I, PWR_MGMT_1, SMPLRT_DIV, ACCEL_CONFIG, GYRO_CONFIG;
+	uint8_t check;
+} MPU6050_Init_StatusTypeDef;
 
-	status.WHO_AM_I =  MPU6050_Read(WHO_AM_I_REG, &status.check, 1);
-
-	if(status.check == 104){
-		data = 0;
-		status.PWR_MGMT_1 = MPU6050_Write(PWR_MGMT_1_REG, &data, 1);
-
-		data = 0x07; // Data rate 1 KHz
-		status.SMPLRT_DIV = MPU6050_Write(SMPLRT_DIV_REG, &data, 1);
-
-		data = 0x00; // XA_ST=0,YA_ST=0,ZA_ST=0, FS_SEL=0 -> ± 2g
-		status.ACCEL_CONFIG = MPU6050_Write(ACCEL_CONFIG_REG, &data, 1);
-
-
-		data = 0x00; // XG_ST=0,YG_ST=0,ZG_ST=0, FS_SEL=0 -> ± 250 ̐/s
-		status.GYRO_CONFIG = MPU6050_Write(GYRO_CONFIG_REG, &data, 1);
-
-
-
-	}
-
-	return status;
-
-}
+MPU6050_Init_StatusTypeDef MPU6050_Init(I2C_HandleTypeDef* hi2c);
+HAL_StatusTypeDef MPU6050_Read_Accel(Vector3* pAccel);
+HAL_StatusTypeDef MPU6050_Read_Gyro(Vector3* pGyro);
 
 
-HAL_StatusTypeDef MPU6050_Read_Accel(Vector3* pAccel){
-	u16vec3 AccelRAW;
-
-	HAL_StatusTypeDef HAL_Status = MPU6050_Read(ACCEL_XOUT_H_REG, (uint8_t*)&AccelRAW, sizeof(AccelRAW));
-
-	pAccel->x = AccelRAW.x / 16384.0;
-	pAccel->y = AccelRAW.y / 16384.0;
-	pAccel->z = AccelRAW.z / 16384.0;
-
-	return HAL_Status;
-}
-
-HAL_StatusTypeDef MPU6050_Read_Gyro(Vector3* pGyro){
-	u16vec3 GyroRAW;
-
-	HAL_StatusTypeDef HAL_Status = MPU6050_Read(GYRO_XOUT_H_REG, (uint8_t*)&GyroRAW, sizeof(GyroRAW));
-
-	pGyro->x = GyroRAW.x / 131.0;
-	pGyro->y = GyroRAW.y / 131.0;
-	pGyro->z = GyroRAW.z / 131.0;
-
-	return HAL_Status;
-
-}
+#endif /* INC_MPU6050_H_ */
